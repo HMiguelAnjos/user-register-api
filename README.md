@@ -1,30 +1,38 @@
-# SOLID + Hexagonal Architecture Go API
+# SOLID + Hexagonal Architecture Go API — User Registration
 
-A small, production-ready example of a REST API in Go using **SOLID** principles and **Hexagonal Architecture** (Ports & Adapters).
+Uma API REST de exemplo, pronta para produção, para **registro e gerenciamento de usuários** em Go, aplicando **princípios SOLID** e **Arquitetura Hexagonal** (Ports & Adapters).
 
-## Highlights
-- **Domain-centric** design (entities have no framework deps).
-- **Ports & Adapters**: `ports` define interfaces; `adapters` implement them (HTTP, in-memory repo, id generator, logger).
-- **Use Cases** in `internal/app` expose application logic.
-- **Controllers** in `internal/adapters/http` translate HTTP <-> DTOs.
-- **Dependency Inversion**: main wires interfaces to concrete adapters.
-- **Patterns used**: Repository, Factory Method, DTO, Strategy (ID generator), Adapter, Controller, Service, Mapper.
+## 🏗 Destaques
+- **Design centrado no domínio** — entidades puras, sem dependência de frameworks.
+- **Ports & Adapters** — `ports` definem interfaces; `adapters` implementam (HTTP, repositório em memória ou banco de dados, gerador de IDs, logger).
+- **Casos de Uso** em `internal/app` contendo toda a lógica de aplicação.
+- **Controllers** em `internal/adapters/http` fazem a tradução HTTP <-> DTOs.
+- **Inversão de Dependência** — o `main` conecta interfaces a implementações concretas.
+- **Padrões utilizados**: Repository, Factory Method, DTO, Strategy (gerador de ID), Adapter, Controller, Service, Mapper.
 
-## Run
+## 🚀 Executando o projeto
 ```bash
 cd user-register-api
 go run ./cmd/api
 ```
-Server starts on `:8080`.
+Servidor disponível em `:8080`.
 
-## Endpoints
-- `POST /v1/tasks` — create task `{ "title": "...", "description": "..." }`
-- `GET /v1/tasks` — list tasks
-- `GET /v1/tasks/{id}` — get by id
-- `PUT /v1/tasks/{id}` — update `{ "title": "...", "description": "...", "done": true }`
-- `DELETE /v1/tasks/{id}` — delete
+## 📌 Endpoints
+- **POST /v1/users** — cria usuário  
+  **Body:**  
+  ```json
+  { "name": "John Doe", "email": "john@example.com", "password": "123456" }
+  ```
+- **GET /v1/users** — lista todos os usuários
+- **GET /v1/users/{id}** — busca usuário pelo ID
+- **PUT /v1/users/{id}** — atualiza dados do usuário  
+  **Body:**  
+  ```json
+  { "name": "John Updated", "email": "john.updated@example.com" }
+  ```
+- **DELETE /v1/users/{id}** — remove usuário
 
-## Tests
+## 🧪 Rodando os testes
 ```bash
 go test ./...
 ```
