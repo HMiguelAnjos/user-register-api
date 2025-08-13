@@ -5,15 +5,15 @@ import (
 
 	"userregisterapi/internal/adapters/id"
 	"userregisterapi/internal/adapters/logger"
-	"userregisterapi/internal/adapters/repository/memory"
 	app "userregisterapi/internal/app/usecase"
+	"userregisterapi/internal/infrastructure/repository/memory"
 )
 
 func TestCreateListTask_Unit(t *testing.T) {
-	repo := memory.NewTaskRepoMemory()
+	repo := memory.NewUserRepoMemory()
 	ids := id.NewUUIDGenerator()
 	lg := logger.NewStdLogger()
-	svc := app.NewTaskService(repo, ids, lg)
+	svc := app.NewUserService(repo, ids, lg)
 
 	created, err := svc.Create("Learn Go", "Practice SOLID + Hexagonal")
 	if err != nil {

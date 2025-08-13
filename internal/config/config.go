@@ -1,17 +1,30 @@
 package config
 
 import (
-    "os"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-    Addr string
+	Addr        string
+	DatabaseURL string
+	LogLevel    string
+}
+
+func getenv(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }
 
 func Load() *Config {
-    addr := os.Getenv("ADDR")
-    if addr == "" {
-        addr = ":8080"
-    }
-    return &Config{Addr: addr}
+	_ = godotenv.Load()
+
+	return &Config{
+		Addr:        getenv("ADDR", ":8080"),
+		DatabaseURL: os.Getenv("DATABASE_URL"),
+		LogLevel:    getenv("LOG_LEVEL", "info"),
+	}
 }

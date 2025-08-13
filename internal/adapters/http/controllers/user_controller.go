@@ -1,4 +1,4 @@
-package httpadapter
+package controllers
 
 import (
 	"encoding/json"
@@ -11,17 +11,17 @@ import (
 	"userregisterapi/internal/domain"
 )
 
-// TaskController is a Controller that translates HTTP <-> UseCases (Application layer).
-type TaskController struct {
-	svc *app.TaskService
+// UserController is a Controller that translates HTTP <-> UseCases (Application layer).
+type UserController struct {
+	svc *app.UserService
 }
 
-func NewTaskController(svc *app.TaskService) *TaskController {
-	return &TaskController{svc: svc}
+func NewUserController(svc *app.UserService) *UserController {
+	return &UserController{svc: svc}
 }
 
-func (c *TaskController) CreateTask(w http.ResponseWriter, r *http.Request) {
-	var req dto.CreateTaskRequest
+func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var req dto.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid body"})
 		return
@@ -31,10 +31,10 @@ func (c *TaskController) CreateTask(w http.ResponseWriter, r *http.Request) {
 		writeDomainError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusCreated, toTaskResponse(t))
+	writeJSON(w, http.StatusCreated, toUserResponse(t))
 }
 
-func (c *TaskController) GetTask(w http.ResponseWriter, r *http.Request, id string) {
+func (c *UserController) GetUser(w http.ResponseWriter, r *http.Request, id string) {
 	t, err := c.svc.Get(id)
 	if err != nil {
 		if err == common.ErrNotFound {
@@ -44,24 +44,24 @@ func (c *TaskController) GetTask(w http.ResponseWriter, r *http.Request, id stri
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
-	writeJSON(w, http.StatusOK, toTaskResponse(t))
+	writeJSON(w, http.StatusOK, toUserResponse(t))
 }
 
-func (c *TaskController) ListTasks(w http.ResponseWriter, r *http.Request) {
+func (c *UserController) ListUsers(w http.ResponseWriter, r *http.Request) {
 	list, err := c.svc.List()
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
-	out := make([]dto.TaskResponse, 0, len(list))
+	out := make([]dto.UserResponse, 0, len(list))
 	for _, t := range list {
-		out = append(out, toTaskResponse(t))
+		out = append(out, toUserResponse(t))
 	}
 	writeJSON(w, http.StatusOK, out)
 }
 
-func (c *TaskController) UpdateTask(w http.ResponseWriter, r *http.Request, id string) {
-	var req dto.UpdateTaskRequest
+func (c *UserController) UpdateUser(w http.ResponseWriter, r *http.Request, id string) {
+	var req dto.UpdateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid body"})
 		return
@@ -75,10 +75,10 @@ func (c *TaskController) UpdateTask(w http.ResponseWriter, r *http.Request, id s
 		writeDomainError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, toTaskResponse(t))
+	writeJSON(w, http.StatusOK, toUserResponse(t))
 }
 
-func (c *TaskController) DeleteTask(w http.ResponseWriter, r *http.Request, id string) {
+func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request, id string) {
 	if err := c.svc.Delete(id); err != nil {
 		if err == common.ErrNotFound {
 			writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
@@ -101,8 +101,8 @@ func writeDomainError(w http.ResponseWriter, err error) {
 	}
 }
 
-func toTaskResponse(t *domain.Task) dto.TaskResponse {
-	return dto.TaskResponse{
+func toUserResponse(t *domain.User) dto.UserResponse {
+	return dto.UserResponse{
 		ID:          t.ID,
 		Title:       t.Title,
 		Description: t.Description,

@@ -8,25 +8,25 @@ import (
 )
 
 // Ensure implementation
-var _ ports.TaskRepository = (*TaskRepoMemory)(nil)
+var _ ports.UserRepository = (*UserRepoMemory)(nil)
 
-type TaskRepoMemory struct {
+type UserRepoMemory struct {
 	mu    sync.RWMutex
-	items map[string]*domain.Task
+	items map[string]*domain.User
 }
 
-func NewTaskRepoMemory() *TaskRepoMemory {
-	return &TaskRepoMemory{items: make(map[string]*domain.Task)}
+func NewUserRepoMemory() *UserRepoMemory {
+	return &UserRepoMemory{items: make(map[string]*domain.User)}
 }
 
-func (r *TaskRepoMemory) Save(task *domain.Task) error {
+func (r *UserRepoMemory) Save(User *domain.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.items[task.ID] = task
+	r.items[User.ID] = User
 	return nil
 }
 
-func (r *TaskRepoMemory) GetByID(id string) (*domain.Task, error) {
+func (r *UserRepoMemory) GetByID(id string) (*domain.User, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	t, ok := r.items[id]
@@ -36,27 +36,27 @@ func (r *TaskRepoMemory) GetByID(id string) (*domain.Task, error) {
 	return t, nil
 }
 
-func (r *TaskRepoMemory) List() ([]*domain.Task, error) {
+func (r *UserRepoMemory) List() ([]*domain.User, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	out := make([]*domain.Task, 0, len(r.items))
+	out := make([]*domain.User, 0, len(r.items))
 	for _, v := range r.items {
 		out = append(out, v)
 	}
 	return out, nil
 }
 
-func (r *TaskRepoMemory) Update(task *domain.Task) error {
+func (r *UserRepoMemory) Update(User *domain.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if _, ok := r.items[task.ID]; !ok {
+	if _, ok := r.items[User.ID]; !ok {
 		return common.ErrNotFound
 	}
-	r.items[task.ID] = task
+	r.items[User.ID] = User
 	return nil
 }
 
-func (r *TaskRepoMemory) Delete(id string) error {
+func (r *UserRepoMemory) Delete(id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, ok := r.items[id]; !ok {

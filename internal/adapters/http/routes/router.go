@@ -1,13 +1,15 @@
-package httpadapter
+package routers
 
 import (
 	"net/http"
+
+	"userregisterapi/internal/adapters/http/controllers"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func NewRouter(c *TaskController) http.Handler {
+func NewRouter(c *controllers.UserController) http.Handler {
 	r := chi.NewRouter()
 
 	// Middlewares úteis (id de request, recovery, compressão, etc.)
@@ -17,22 +19,22 @@ func NewRouter(c *TaskController) http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Compress(5))
 
-	r.Route("/v1", func(r chi.Router) {
-		r.Route("/tasks", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
+		r.Route("/user", func(r chi.Router) {
 			// collection
-			r.Get("/", c.ListTasks)
-			r.Post("/", c.CreateTask)
+			r.Get("/", c.ListUsers)
+			r.Post("/", c.CreateUser)
 
 			// item
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/", func(w http.ResponseWriter, req *http.Request) {
-					c.GetTask(w, req, chi.URLParam(req, "id"))
+					c.GetUser(w, req, chi.URLParam(req, "id"))
 				})
 				r.Put("/", func(w http.ResponseWriter, req *http.Request) {
-					c.UpdateTask(w, req, chi.URLParam(req, "id"))
+					c.UpdateUser(w, req, chi.URLParam(req, "id"))
 				})
 				r.Delete("/", func(w http.ResponseWriter, req *http.Request) {
-					c.DeleteTask(w, req, chi.URLParam(req, "id"))
+					c.DeleteUser(w, req, chi.URLParam(req, "id"))
 				})
 			})
 		})

@@ -3,15 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
-	httpadapter "userregisterapi/internal/adapters/http"
+	controllers "userregisterapi/internal/adapters/http/controllers"
+	routers "userregisterapi/internal/adapters/http/routes"
 	"userregisterapi/internal/adapters/id"
 	"userregisterapi/internal/adapters/logger"
-	"userregisterapi/internal/adapters/repository/memory"
 	"userregisterapi/internal/app/ports"
 	app "userregisterapi/internal/app/usecase"
 	"userregisterapi/internal/config"
+	"userregisterapi/internal/infrastructure/repository/memory"
 
 	pgdb "userregisterapi/internal/infrastructure/db"
 	pgrepo "userregisterapi/internal/infrastructure/repository/postgres"
@@ -20,32 +20,26 @@ import (
 func main() {
 	cfg := config.Load()
 
-	var repo ports.TaskRepository
+	var repo ports.UserRepository
 
-	// Se existir DATABASE_URL no ambiente, usa Postgres; caso contrário, usa memória
-	if os.Getenv("DATABASE_URL") != "" {
+	if cfg.DatabaseURL != "" {
 		db := pgdb.NewPostgresDB()
 		defer db.Close()
-		repo = pgrepo.NewTaskRepoPostgres(db)
+		repo = pgrepo.NewUserRepoPostgres(db)
 		log.Println("[INFO] Using PostgreSQL repository")
 	} else {
-		repo = memory.NewTaskRepoMemory()
+		repo = memory.NewUserRepoMemory()
 		log.Println("[WARN] DATABASE_URL not set, using in-memory repository")
 	}
 
-	// Adapters
 	ids := id.NewUUIDGenerator()
 	lg := logger.NewStdLogger()
 
-	// Application service (use cases)
-	svc := app.NewTaskService(repo, ids, lg)
+	svc := app.NewUserService(repo, ids, lg)
 
-	// Controllers + Router
-	ctrl := httpadapter.NewTaskController(svc)
-	router := httpadapter.NewRouter(ctrl)
+	ctrl := controllers.NewUserController(svc)
+	router := routers.NewRouter(ctrl)
 
 	log.Printf("Starting server on %s", cfg.Addr)
-	if err := http.ListenAndServe(cfg.Addr, router); err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(http.ListenAndServe(cfg.Addr, router))
 }
